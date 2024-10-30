@@ -110,3 +110,84 @@ const getMonthNumber = (month: string): number => {
     return months[month.trim()] || 1;
 };
 
+
+
+interface GroupedData {
+    country: string;
+    total_visitors: number;
+    hotels?: { [key: string]: number };
+}
+
+interface DateGroupedData {
+    date: string;
+    total_visitors: number;
+    hotels?: { [key: string]: number };
+}
+
+export const groupByCountry = (data: BookingData[]): GroupedData[] => {
+    const grouped = data.reduce((acc, curr) => {
+        if (!curr.country) return acc;
+        
+        const country = curr.country.trim();
+        if (!acc[country]) {
+            acc[country] = {
+                total_visitors: 0,
+                hotels: {}
+            };
+        }
+        
+        acc[country].total_visitors += curr.total_visitors || 0;
+        
+        if (curr.hotel) {
+            if (!acc[country].hotels[curr.hotel]) {
+                acc[country].hotels[curr.hotel] = 0;
+            }
+            acc[country].hotels[curr.hotel] += curr.total_visitors || 0;
+        }
+        
+        return acc;
+    }, {} as { [key: string]: { total_visitors: number; hotels: { [key: string]: number } } });
+
+    return Object.entries(grouped)
+        .map(([country, data]) => ({
+            country,
+            total_visitors: data.total_visitors,
+            hotels: data.hotels
+        }))
+        .sort((a, b) => b.total_visitors - a.total_visitors);
+};
+
+export const groupByDate = (data: BookingData[]): DateGroupedData[] => {
+    const grouped = data.reduce((acc, curr) => {
+        const date = curr.date;
+        if (!date) return acc;
+        
+        if (!acc[date]) {
+            acc[date] = {
+                total_visitors: 0,
+                hotels: {}
+            };
+        }
+        
+        acc[date].total_visitors += curr.total_visitors || 0;
+        
+        if (curr.hotel) {
+            if (!acc[date].hotels[curr.hotel]) {
+                acc[date].hotels[curr.hotel] = 0;
+            }
+            acc[date].hotels[curr.hotel] += curr.total_visitors || 0;
+        }
+        
+        return acc;
+    }, {} as { [key: string]: { total_visitors: number; hotels: { [key: string]: number } } });
+
+    return Object.entries(grouped)
+        .map(([date, data]) => ({
+            date,
+            total_visitors: data.total_visitors,
+            hotels: data.hotels
+        }))
+        .sort((a, b) => a.date.localeCompare(b.date));
+};
+
+
