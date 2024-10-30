@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import React from 'react';
+import Dashboard from './components/Dashboard';
 
-
-function App() {
+const App: React.FC = () => {
   return (
-    <>
-        
-    </>
-  )
-}
+    <div className="App">
+      <Dashboard />
+    </div>
+  );
+};
 
-export default App
+export default App;
